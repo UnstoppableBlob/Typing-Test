@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Test</title>
+    <style>
+        body {
+            font-family: "Consolas", monospace;
+            background-color: #2D2D2D;
+            color: #FFFFFF;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+        }
+        .sentence-container {
+            font-size: 20px;
+            color: #A9A9A9;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .correct {
+            color: #FFFFFF; /* Correct text in white */
+        }
+        .incorrect {
+            color: #FF0000; /* Incorrect text in red */
+        }
+        .untouched {
+            color: #A9A9A9; /* Untyped text in gray */
+        }
+        input {
+            font-size: 18px;
+            padding: 10px;
+            width: 80%; /* Adjust the width of the input field */
+            margin: 10px auto; /* Center the input horizontally */
+        }
+        .results {
+            font-size: 18px;
+            color: #A9A9A9;
+            margin-top: 0px; /* Directly under the input field */
+        }
+        .reload-text {
+            font-size: 18px;
+            color: #A9A9A9;
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .completion-message {
+            font-size: 18px;
+            color: #00FF00; /* Green color for completion message */
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Typing Test</h1>
+    <div class="sentence-container" id="sentence"></div>
+    <input type="text" id="typingInput" placeholder="Start typing here..." autocomplete="off" />
+    <div class="results" id="results"></div>
+    <div class="completion-message" id="completionMessage" style="display: none;">You've completed the sentence!</div>
+
+    <!-- Reload text at the bottom -->
+    <div class="reload-text" id="reloadText">Reload when done typing to try again</div>
+
+    <script>
+        let sentence = '';
+        let startTime = null; // Start time for typing
+        let totalTime = 0; // Track total time
+        let totalWordsTyped = 0; // Track total words typed
+        let totalCorrectChars = 0; // Track correct characters
+        let isTestCompleted = false; // Flag to check if sentence is completed
+
+        // Fetch a new sentence from the Flask backend
+        async function fetchSentence() {
+            const response = await fetch('/get_sentence');
+            const data = await response.json();
+            sentence = data.sentence;
+            document.getElementById('sentence').textContent = sentence;
+            renderSentence(); // Render the sentence for the first time
+        }
+
+        // Render the sentence with dynamic styling for typed, incorrect, and untouched text
+        function renderSentence() {
+            const sentenceContainer = document.getElementById('sentence');
+            sentenceContainer.innerHTML = ''; // Clear previous content
+            let typed = document.getElementById('typingInput').value; // Get the user's typed input
+
+            for (let i = 0; i < sentence.length; i++) {
+                let char = sentence[i];
+                let span = document.createElement('span');
+
+                if (i < typed.length) {
+                    if (typed[i] === char) {
+                        span.className = 'correct';
+                    } else {
+                        span.className = 'incorrect';
+                    }
+                    span.textContent = char;
+                } else {
+                    span.className = 'untouched';
+                    span.textContent = char;
+                }
+
+                sentenceContainer.appendChild(span);
+            }
+        }
+
+        // Start the timer when the user starts typing
+        document.getElementById('typingInput').addEventListener('focus', () => {
+            if (!startTime) {
+                startTime = Date.now(); // Start the timer
+            }
+        });
+
+        // Handle the completion of the test when the user finishes typing
+        document.getElementById('typingInput').addEventListener('input', async () => {
+            renderSentence(); // Update the sentence display as the user types
+
+            const userInput = document.getElementById('typingInput').value;
+
+            // Calculate time taken
+            const currentTime = Date.now();
+            const timeTaken = (currentTime - startTime) / 1000; // Time in seconds
+
+            // Calculate WPM (Words Per Minute)
+            const wpm = (userInput.split(' ').length / timeTaken) * 60;
+
+            // Calculate correct characters and accuracy
+            let correctChars = 0;
+            for (let i = 0; i < userInput.length; i++) {
+                if (userInput[i] === sentence[i]) {
+                    correctChars++;
+                }
+            }
+            const accuracy = (correctChars / sentence.length) * 100;
+
+            // Update the results
+            document.getElementById('results').innerHTML =
+                `Time Taken: ${timeTaken.toFixed(2)} seconds<br>
+                WPM: ${wpm.toFixed(2)}<br>
+                Accuracy: ${accuracy.toFixed(2)}%`;
+
+            // If the user finishes typing the sentence
+            if (userInput.length === sentence.length && !isTestCompleted) {
+                totalTime += timeTaken;
+                totalWordsTyped += userInput.split(' ').length;
+                totalCorrectChars += correctChars;
+
+                // Mark the sentence as completed
+                isTestCompleted = true;
+
+                // Show the completion message
+                document.getElementById('completionMessage').style.display = 'block';
+
+                // Wait for a new sentence
+                await fetchSentence();
+
+                // Restart the timer for the next sentence
+                startTime = Date.now();
+                isTestCompleted = false; // Reset the flag for the next sentence
+                document.getElementById('typingInput').value = ''; // Clear the input field
+                document.getElementById('completionMessage').style.display = 'none'; // Hide the completion message
+            }
+        });
+
+        // Load the initial sentence when the page loads
+        fetchSentence();
+    </script>
+
+</body>
+</html>
