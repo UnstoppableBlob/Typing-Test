@@ -3,7 +3,7 @@ import random
 
 app = Flask(__name__)
 
-# Expanded word list with 1,000 words
+
 word_list = [
     "apple", "banana", "orange", "grape", "pineapple", "kiwi", "mango", "cherry", "strawberry", "blueberry",
     "computer", "keyboard", "monitor", "mouse", "laptop", "internet", "server", "network", "software", "hardware",
@@ -24,7 +24,7 @@ word_list = [
     "robot", "artificial", "intelligence", "machine", "computer", "algorithm", "technology", "programming", "coding", "debugging",
     "zebra", "abyss", "ephemeral", "quixotic", "melancholy", "elusive", "solitude", "serenity", "cascading", "whimsical",
     "vibrant", "silhouette", "luminescence", "lullaby", "tapestry", "harbinger", "equanimity", "eclipse", "mysterious", "ethereal",
-    # Added words 301 to 800
+   
     "umbrella", "puzzle", "volcano", "garden", "mosaic", "gravity", "momentum", "pulse", "guitar", "lighthouse",
     "butterfly", "pyramid", "mountain", "snow", "whirlwind", "insight", "courage", "spontaneous", "pathway", "lullaby",
     "mountain", "breeze", "exotic", "plaza", "euphoria", "mountain", "whisper", "candles", "horizon", "starry",
@@ -37,16 +37,18 @@ word_list = [
     "wavelength", "elemental", "quest", "cosmic", "coral", "vintage", "sunbeam", "drift", "turbulence", "antique",
     "frost", "whispers", "echoes", "cascade", "pulse", "tiger", "dream", "lunar", "butterfly", "mystic",
     "illusion", "vintage", "ocean", "paradise", "hologram", "magnetism", "reflection", "mystique", "quicksilver", "planet",
-    # Added words 801 to 1000
+   
     "mimic", "cosmos", "vivid", "fractal", "puzzle", "relic", "glimmer", "revelation", "phoenix", "sapphire",
     "dawn", "gale", "flame", "melody", "mirror", "vision", "clarity", "sprinkle", "rhythm", "aurora",
     "brilliance", "tune", "summit", "specter", "spectrum", "eclipse", "sparkle", "lunar", "vibrance", "glow",
     "infinite", "phenomenon", "inception", "quintessential", "epiphany", "aura", "treasure", "flair", "flourish", "energy",
     "whirlwind", "resonance", "flicker", "lattice", "galactic", "arcane", "seraphic", "zephyr", "radiance", "unravel",
-    "twilight", "pioneer", "flare", "luminary", "ripple", "stellar", "illusion", "alchemy", "reflection", "wanderer"
+    "twilight", "pioneer", "flare", "luminary", "ripple", "stellar", "illusion", "alchemy", "reflection", "wanderer", "want a", "need",
+    "have a", "want to", "need to", "have to", "want", "need", "have", "want", "need", "have", "is it", "are it", "was it", "were it",
+    "is", "are", "was", "were", "is", "are", "was", "were", "is", "are", "was", "were",
 ]
 
-# Function to generate a random sentence
+
 def generate_random_sentence(word_count=12):
     return ' '.join(random.choice(word_list) for _ in range(word_count))
 
@@ -56,7 +58,7 @@ def index():
 
 @app.route('/get_sentence')
 def get_sentence():
-    sentence = generate_random_sentence(word_count=20)  # Generate a random sentence with 12 words
+    sentence = generate_random_sentence(word_count=20)  
     return jsonify({'sentence': sentence})
 
 if __name__ == '__main__':

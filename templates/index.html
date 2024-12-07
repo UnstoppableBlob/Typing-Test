@@ -25,24 +25,24 @@
             word-wrap: break-word;
         }
         .correct {
-            color: #FFFFFF; /* Correct text in white */
+            color: #FFFFFF; 
         }
         .incorrect {
-            color: #FF0000; /* Incorrect text in red */
+            color: #FF0000; 
         }
         .untouched {
-            color: #A9A9A9; /* Untyped text in gray */
+            color: #A9A9A9;
         }
         input {
             font-size: 18px;
             padding: 10px;
-            width: 80%; /* Adjust the width of the input field */
-            margin: 10px auto; /* Center the input horizontally */
+            width: 80%; 
+            margin: 10px auto;
         }
         .results {
             font-size: 18px;
             color: #A9A9A9;
-            margin-top: 0px; /* Directly under the input field */
+            margin-top: 0px;
         }
         .reload-text {
             font-size: 18px;
@@ -54,7 +54,7 @@
         }
         .completion-message {
             font-size: 18px;
-            color: #00FF00; /* Green color for completion message */
+            color: #00FF00;
             margin-top: 20px;
         }
     </style>
@@ -67,31 +67,30 @@
     <div class="results" id="results"></div>
     <div class="completion-message" id="completionMessage" style="display: none;">You've completed the sentence!</div>
 
-    <!-- Reload text at the bottom -->
+  
     <div class="reload-text" id="reloadText">Reload when done typing to try again</div>
 
     <script>
         let sentence = '';
-        let startTime = null; // Start time for typing
-        let totalTime = 0; // Track total time
-        let totalWordsTyped = 0; // Track total words typed
-        let totalCorrectChars = 0; // Track correct characters
-        let isTestCompleted = false; // Flag to check if sentence is completed
+        let startTime = null; 
+        let totalTime = 0; 
+        let totalWordsTyped = 0; 
+        let totalCorrectChars = 0; 
+        let isTestCompleted = false; 
 
-        // Fetch a new sentence from the Flask backend
+      
         async function fetchSentence() {
             const response = await fetch('/get_sentence');
             const data = await response.json();
             sentence = data.sentence;
             document.getElementById('sentence').textContent = sentence;
-            renderSentence(); // Render the sentence for the first time
+            renderSentence(); 
         }
 
-        // Render the sentence with dynamic styling for typed, incorrect, and untouched text
-        function renderSentence() {
+             function renderSentence() {
             const sentenceContainer = document.getElementById('sentence');
-            sentenceContainer.innerHTML = ''; // Clear previous content
-            let typed = document.getElementById('typingInput').value; // Get the user's typed input
+            sentenceContainer.innerHTML = ''; 
+            let typed = document.getElementById('typingInput').value;
 
             for (let i = 0; i < sentence.length; i++) {
                 let char = sentence[i];
@@ -113,27 +112,27 @@
             }
         }
 
-        // Start the timer when the user starts typing
+    
         document.getElementById('typingInput').addEventListener('focus', () => {
             if (!startTime) {
-                startTime = Date.now(); // Start the timer
+                startTime = Date.now();
             }
         });
 
-        // Handle the completion of the test when the user finishes typing
+       
         document.getElementById('typingInput').addEventListener('input', async () => {
-            renderSentence(); // Update the sentence display as the user types
+            renderSentence(); 
 
             const userInput = document.getElementById('typingInput').value;
 
-            // Calculate time taken
+           
             const currentTime = Date.now();
-            const timeTaken = (currentTime - startTime) / 1000; // Time in seconds
+            const timeTaken = (currentTime - startTime) / 1000;
 
-            // Calculate WPM (Words Per Minute)
+          
             const wpm = (userInput.split(' ').length / timeTaken) * 60;
 
-            // Calculate correct characters and accuracy
+    
             let correctChars = 0;
             for (let i = 0; i < userInput.length; i++) {
                 if (userInput[i] === sentence[i]) {
@@ -142,36 +141,34 @@
             }
             const accuracy = (correctChars / sentence.length) * 100;
 
-            // Update the results
+
             document.getElementById('results').innerHTML =
                 `Time Taken: ${timeTaken.toFixed(2)} seconds<br>
                 WPM: ${wpm.toFixed(2)}<br>
                 Accuracy: ${accuracy.toFixed(2)}%`;
 
-            // If the user finishes typing the sentence
+    
             if (userInput.length === sentence.length && !isTestCompleted) {
                 totalTime += timeTaken;
                 totalWordsTyped += userInput.split(' ').length;
                 totalCorrectChars += correctChars;
 
-                // Mark the sentence as completed
                 isTestCompleted = true;
 
-                // Show the completion message
+      
                 document.getElementById('completionMessage').style.display = 'block';
 
-                // Wait for a new sentence
+        
                 await fetchSentence();
 
-                // Restart the timer for the next sentence
+     
                 startTime = Date.now();
-                isTestCompleted = false; // Reset the flag for the next sentence
-                document.getElementById('typingInput').value = ''; // Clear the input field
-                document.getElementById('completionMessage').style.display = 'none'; // Hide the completion message
+                isTestCompleted = false;
+                document.getElementById('completionMessage').style.display = 'none'; 
             }
         });
 
-        // Load the initial sentence when the page loads
+       
         fetchSentence();
     </script>
 
