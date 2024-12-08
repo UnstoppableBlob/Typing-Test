@@ -3,6 +3,7 @@
 ## How to Use It
 
 Just click on the text box, and start typing the text shown in grey. After you are done reload the page to try again. Your score will be shown on the bottom, and will update as you type.
+Here is the website link: https://suspiciousitem.pythonanywhere.com
 
 ## Description
 
